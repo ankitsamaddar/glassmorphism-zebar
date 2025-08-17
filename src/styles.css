@@ -1,0 +1,374 @@
+/**
+ * Import the Nerdfonts icon font.
+ * Ref https://www.nerdfonts.com/cheat-sheet for a cheatsheet of available Nerdfonts icons.
+ */
+@import "https://www.nerdfonts.com/assets/css/webfont.css";
+
+i {
+  /* color: rgb(115 130 175 / 95%); */
+  margin-right: 7px;
+}
+
+body {
+  color: rgb(255 255 255 / 90%);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+div,
+span,
+p {
+  cursor: default;
+  user-select: none;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+@keyframes flash {
+  from {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+#root {
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
+  background: linear-gradient(
+    135deg,
+    #1a1a2e 0%,
+    #16213e 25%,
+    #0f3460 50%,
+    #533483 75%,
+    #e43f5a 100%
+  );
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  align-items: baseline;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  align-items: stretch;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.2) 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  backdrop-filter: blur(10px);
+  padding: 0 5px 2px 5px;
+  gap: 10px;
+}
+
+.left,
+.center,
+.right {
+  height: calc(100% - 15px);
+  display: flex;
+  align-items: center;
+  transform: scaleY(0.9);
+  margin: 3.5px 2px;
+}
+
+.center {
+  justify-self: center;
+}
+
+.right {
+  justify-self: end;
+}
+
+.logo,
+.binding-mode,
+.tiling-direction,
+.paused-button,
+.network,
+.memory,
+.cpu,
+.battery {
+  margin-right: 10px;
+}
+
+.network,
+.memory {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.network,
+.cycle_count,
+.uptime,
+.memory,
+.cpu,
+.battery,
+.weather {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 4px 10px;
+  backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
+  color: rgba(255, 255, 255, 0.9);
+  min-width: 70px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(228, 63, 90, 0.3);
+    box-shadow: 0 2px 8px rgba(228, 63, 90, 0.2);
+  }
+}
+
+.memory {
+  padding: 2px 10px !important;
+}
+
+/* Icon colors using new theme */
+.network i {
+  color: #a0c4ff;
+  transition: all 0.2s ease;
+}
+
+.cpu i {
+  color: #ffadad;
+  transition: all 0.2s ease;
+}
+
+.memory {
+  color: #caffbf;
+  transition: all 0.2s ease;
+}
+
+.battery i {
+  color: #9bf6ff;
+  transition: all 0.2s ease;
+}
+
+/* Hover effects using new theme colors */
+.network:hover i,
+.network:hover span,
+.cpu:hover i,
+.memory:hover i:not([class*="nf-md-alpha_"]),
+.battery:hover i,
+.weather:hover i {
+  color: #fcab64 !important;
+}
+
+
+/* Update hover style */
+.network:hover,
+.cpu:hover,
+.memory:hover,
+.battery:hover,
+.weather:hover {
+  border-color: rgba(251, 139, 36, 0.3);
+  box-shadow: 0 2px 8px rgba(251, 139, 36, 0.2);
+  transform: scale(1.05);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  filter: brightness(1.05);
+}
+
+/* Update alert colors to use theme red */
+.cpu .high-usage {
+  color: #f25757 !important;
+  animation: flash 0.5s infinite;
+}
+
+.memory .high-usage {
+  color: #f25757 !important;
+  animation: flash 0.5s infinite;
+}
+
+.low-battery {
+  color: #f25757 !important;
+  animation: flash 0.5s infinite;
+}
+
+.workspaces {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  position: relative;
+}
+
+.workspaces::before {
+  content: "";
+  position: absolute;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 97, 118, 0.8),
+    rgba(157, 113, 232, 0.8)
+  );
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(228, 63, 90, 0.4);
+  z-index: 0;
+  left: var(--slider-left, 0);
+  width: var(--slider-width, 0);
+  height: calc(100% - 8px);
+  top: 4px;
+}
+
+.workspace {
+  background: transparent;
+  color: rgb(255 255 255 / 70%);
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  margin: 0 2px;
+  padding: 8px 16px;
+  position: relative;
+  z-index: 1;
+  font-weight: 500;
+  min-width: 40px;
+  text-align: center;
+  transition: color 0.3s ease;
+
+  &.displayed {
+    color: rgb(255 255 255 / 85%);
+  }
+
+  &.focused {
+    color: white;
+  }
+
+  &:hover:not(.focused) {
+    color: rgb(255 255 255 / 90%);
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.02);
+  }
+}
+
+.binding-mode,
+.tiling-direction,
+.paused-button {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgb(255 255 255 / 90%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  line-height: 1;
+  padding: 6px 10px;
+  cursor: pointer;
+  backdrop-filter: blur(3px);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(83, 52, 131, 0.3);
+    border-color: rgba(255, 97, 118, 0.4);
+    color: rgb(255, 97, 118);
+  }
+}
+
+.binding-mode {
+  margin-right: 4px;
+}
+
+.network .network-speed {
+  display: flex;
+  flex-direction: column;
+  font-size: 10px;
+  min-width: 30px;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+
+.battery .charging-icon {
+  position: absolute;
+  font-size: 7px;
+  /* left: -2px; */
+  /* top: 3px; */
+  color: rgb(255, 60, 0);
+}
+
+.center {
+  justify-self: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 8px 16px;
+  backdrop-filter: blur(5px);
+  color: #ffffff;
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.center:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(228, 63, 90, 0.3);
+  box-shadow: 0 2px 8px rgba(228, 63, 90, 0.2);
+}
+
+.media-controls {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px 6px;
+  cursor: pointer;
+  backdrop-filter: blur(3px);
+  transition: all 0.2s ease;
+  font-size: 8px !important;
+  color: white !important;
+}
+
+.media-controls:hover {
+  background: rgba(171, 255, 97, 0.3) !important;
+  border-color: rgba(27, 185, 84, 0.5) !important;
+  color: #76ff61 !important;
+  transform: scale(1.1);
+}
+
+.media-controls:active {
+  background: rgba(255, 146, 177, 0.5) !important;
+  border-color: rgba(228, 63, 90, 0.4) !important;
+  color: #fe7295 !important;
+  transform: scale(0.95);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.song-time {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  backdrop-filter: blur(2px);
+}
+
+.window-title {
+  transition: opacity 1s ease;
+  min-width: 300px;
+  display: inline-block;
+  text-align: center;
+}
+
+.nf:not([class*="nf-md-alpha_"]):not([class*="nf-md-swap_"]):not(
+    [class*="nf-md-power_plug"]
+  ) {
+  font-size: 16px;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+}

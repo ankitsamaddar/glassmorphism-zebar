@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Custom styles. -->
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
+
+    <!-- Allows React to be run buildless via "text/babel" script below. -->
+    <script
+      src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
+      integrity="sha256-aS0B0wnsaDByLfE16h4MDCP1fQFccysd1YWOcV+gbBo="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+      import React, { useState, useEffect } from "https://esm.sh/react@18?dev";
+      import { createRoot } from "https://esm.sh/react-dom@18/client?dev";
+      import * as zebar from "https://esm.sh/zebar@2";
+
+      const providers = zebar.createProviderGroup({
+        network: { type: "network" },
+        glazewm: { type: "glazewm" },
+        cpu: { type: "cpu" },
+        date: { type: "date", formatting: "EEE d MMM yyyy t" },
+        battery: { type: "battery" },
+        memory: { type: "memory" },
+        weather: { type: "weather" },
+        media: { type: "media" },
+      });
+
+      createRoot(document.getElementById("root")).render(<App />);
+
+      // Parse title of the active window (NOT ACCURATE)
+      function getFocusedWindowTitle(focusedMonitor) {
+        const PARSING_EXCLUSIONS_ARRAY = ["Spotify"];
+        const PARSING_REGEX = /[-—]/;
+
+        if (!focusedMonitor || focusedMonitor.type !== "monitor") {
+          return null;
+        }
+
+        const focusedWorkspace = focusedMonitor.children.find(
+          (ws) => ws.hasFocus
+        );
+        if (!focusedWorkspace) return null;
+
+        const focusedWindow = focusedWorkspace.children.find((w) => w.hasFocus);
+        if (!focusedWindow || focusedWindow.type !== "window") {
+          return (
+            focusedWorkspace.displayName || `Workspace ${focusedWorkspace.name}`
+          );
+        }
+
+        const title = focusedWindow.title || "";
+        const process = focusedWindow.processName || "";
+
+        const isExcluded = PARSING_EXCLUSIONS_ARRAY.some((ex) =>
+          process.startsWith(ex)
+        );
+
+        if (isExcluded) {
+          return process;
+        }
+
+        const parts = title.split(PARSING_REGEX);
+        return parts.length > 1 ? parts[parts.length - 1].trim() : title;
+      }
+
+      // Center component \w Spotify Media controls (on hover)
+      function CenterContent({ output, showMedia, setShowMedia, formatTime }) {
+        const spotifySession = output.media?.allSessions?.find(
+          (s) => s.sessionId === "Spotify.exe"
+        );
+
+        const focusedMonitor = output.glazewm?.focusedMonitor;
+        const windowTitle = getFocusedWindowTitle(focusedMonitor);
+
+        return (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+            onMouseEnter={() => spotifySession && setShowMedia(true)}
+            onMouseLeave={() => setShowMedia(false)}
+          >
+            {showMedia && spotifySession ? (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <i
+                  className="nf nf-fa-spotify"
+                  style={{ color: "#1db954" }}
+                ></i>
+                <span>
+                  {spotifySession.title} - {spotifySession.artist}
+                </span>
+                <span
+                  className="song-time"
+                  style={{ fontSize: "10px", color: "#ccc" }}
+                >
+                  {formatTime(spotifySession.position)} /{" "}
+                  {formatTime(spotifySession.endTime)}
+                </span>
+                <div style={{ display: "flex", gap: "5px" }}>
+                  <button
+                    className="nf nf-md-skip_previous media-controls"
+                    onClick={() =>
+                      output.media.previous({
+                        sessionId: "Spotify.exe",
+                      })
+                    }
+                  ></button>
+                  <button
+                    className={`nf ${
+                      spotifySession.isPlaying ? "nf-md-pause" : "nf-md-play"
+                    } media-controls`}
+                    onClick={() =>
+                      output.media.togglePlayPause({
+                        sessionId: "Spotify.exe",
+                      })
+                    }
+                  ></button>
+                  <button
+                    className="nf nf-md-skip_next media-controls"
+                    onClick={() =>
+                      output.media.next({ sessionId: "Spotify.exe" })
+                    }
+                  ></button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <span className="window-title">
+                  {windowTitle ? `${windowTitle} | ` : ""}
+                  {output.date?.formatted}
+                </span>
+              </>
+            )}
+          </div>
+        );
+      }
+
+      function App() {
+        const [output, setOutput] = useState(providers.outputMap);
+        const [showMedia, setShowMedia] = useState(false);
+        // console.log("The entire Output: ", output);
+        function updateSliderPosition() {
+          const workspaces = document.querySelector(".workspaces");
+          const focusedButton = workspaces?.querySelector(".workspace.focused");
+
+          if (focusedButton && workspaces) {
+            const rect = focusedButton.getBoundingClientRect();
+            const containerRect = workspaces.getBoundingClientRect();
+
+            const left = rect.left - containerRect.left;
+            const width = rect.width;
+
+            workspaces.style.setProperty("--slider-left", `${left}px`);
+            workspaces.style.setProperty("--slider-width", `${width}px`);
+          }
+        }
+
+        React.useEffect(() => {
+          updateSliderPosition();
+        }, [output.glazewm?.currentWorkspaces]);
+
+        useEffect(() => {
+          providers.onOutput(() => setOutput(providers.outputMap));
+        }, []);
+
+        function formatTime(seconds) {
+          const mins = Math.floor(seconds / 60);
+          const secs = seconds % 60;
+          return `${mins}:${secs.toString().padStart(2, "0")}`;
+        }
+
+        function formatSpeed(downloadSpeed, uploadSpeed) {
+          const format = (val) =>
+            Number.isInteger(val) ? val.toString() : val.toFixed(1);
+
+          const dl = format(downloadSpeed);
+          const ul = format(uploadSpeed);
+
+          const width = Math.max(dl.length, ul.length);
+
+          return {
+            download: dl.padStart(2 - dl.length, " "),
+            upload: ul.padStart(2 - ul.length, " "),
+          };
+        }
+
+        // Get icon to show for current network status.
+        function getNetworkIcon(networkOutput) {
+          const downloadSpeed = networkOutput.traffic?.received?.siValue || 0;
+          const uploadSpeed = networkOutput.traffic?.transmitted?.siValue || 0;
+          const downloadUnit = networkOutput.traffic?.received?.siUnit || "B";
+          const uploadUnit = networkOutput.traffic?.transmitted?.siUnit || "B";
+
+          const hasActivity = downloadSpeed > 0 || uploadSpeed > 0;
+
+          const format = (val) =>
+            Number.isInteger(val) ? val.toString() : val.toFixed(1);
+
+          const dl = format(downloadSpeed) + downloadUnit;
+          const ul = format(uploadSpeed) + uploadUnit;
+
+          const download = dl.padEnd(6, " ");
+          const upload = ul.padEnd(6, " ");
+
+          switch (networkOutput.defaultInterface?.type) {
+            case "ethernet":
+              return (
+                <>
+                  <i
+                    className={`nf ${
+                      hasActivity ? "nf-md-ethernet" : "nf-md-ethernet_off"
+                    }`}
+                  ></i>
+                  <div className="network-speed">
+                    <div>↓{download}</div>
+                    <div>↑{upload}</div>
+                  </div>
+                </>
+              );
+            case "wifi":
+              return (
+                <>
+                  <i
+                    className={`nf ${
+                      hasActivity
+                        ? "nf-md-wifi_arrow_up_down"
+                        : "nf-md-wifi_cancel"
+                    }`}
+                  ></i>
+                  <div className="network-speed">
+                    <div>↓{download}</div>
+                    <div>↑{upload}</div>
+                  </div>
+                </>
+              );
+            default:
+              return <i className="nf nf-md-wifi_cancel"></i>;
+          }
+        }
+
+        // Get icon to show for how much of the battery is charged.
+        function getBatteryIcon(batteryOutput) {
+          if (batteryOutput.chargePercent > 90)
+            return <i className="nf nf-fa-battery_4"></i>;
+          if (batteryOutput.chargePercent > 70)
+            return <i className="nf nf-fa-battery_3"></i>;
+          if (batteryOutput.chargePercent > 40)
+            return <i className="nf nf-fa-battery_2"></i>;
+          if (batteryOutput.chargePercent > 30)
+            return <i className="nf nf-fa-battery_1"></i>;
+          return <i className="nf nf-fa-battery_0"></i>;
+        }
+
+        // Get icon to show for current weather status.
+        function getWeatherIcon(weatherOutput) {
+          switch (weatherOutput.status) {
+            case "clear_day":
+              return (
+                <i
+                  className="nf nf-weather-day_sunny"
+                  style={{ color: "#FFF9B1" }} // Pastel yellow
+                ></i>
+              );
+
+            case "clear_night":
+              return (
+                <i
+                  className="nf nf-weather-night_clear"
+                  style={{ color: "#B5EAD7" }} // Pastel mint
+                ></i>
+              );
+
+            case "cloudy_day":
+              return (
+                <i
+                  className="nf nf-weather-day_cloudy"
+                  style={{ color: "#D3D3D3" }} // Light gray (soft cloud)
+                ></i>
+              );
+
+            case "cloudy_night":
+              return (
+                <i
+                  className="nf nf-weather-night_alt_cloudy"
+                  style={{ color: "#C0C0C0" }} // Slightly darker soft gray
+                ></i>
+              );
+
+            case "light_rain_day":
+              return (
+                <i
+                  className="nf nf-weather-day_sprinkle"
+                  style={{ color: "#A0E7FF" }} // Pastel sky blue
+                ></i>
+              );
+
+            case "light_rain_night":
+              return (
+                <i
+                  className="nf nf-weather-night_alt_sprinkle"
+                  style={{ color: "#B5EAD7" }} // Pastel mint (consistent with night theme)
+                ></i>
+              );
+
+            case "heavy_rain_day":
+              return (
+                <i
+                  className="nf nf-weather-day_rain"
+                  style={{ color: "#7AC7E7" }} // Soft pastel blue
+                ></i>
+              );
+
+            case "heavy_rain_night":
+              return (
+                <i
+                  className="nf nf-weather-night_alt_rain"
+                  style={{ color: "#8AD0D8" }} // Muted teal pastel
+                ></i>
+              );
+
+            case "snow_day":
+              return (
+                <i
+                  className="nf nf-weather-day_snow"
+                  style={{ color: "#F0F8FF" }} // Very light blue-white (icy pastel)
+                ></i>
+              );
+
+            case "snow_night":
+              return (
+                <i
+                  className="nf nf-weather-night_alt_snow"
+                  style={{ color: "#E6F3FF" }} // Slightly visible icy tone
+                ></i>
+              );
+
+            case "thunder_day":
+              return (
+                <i
+                  className="nf nf-weather-day_lightning"
+                  style={{ color: "#FFD1DC" }} // Pastel pink (soft for contrast)
+                ></i>
+              );
+
+            case "thunder_night":
+              return (
+                <i
+                  className="nf nf-weather-night_alt_lightning"
+                  style={{ color: "#CBAACB" }} // Pastel lavender
+                ></i>
+              );
+
+            default:
+              return (
+                <i
+                  className="nf nf-weather-question"
+                  style={{ color: "#CCCCCC" }}
+                ></i>
+              );
+          }
+        }
+
+        return (
+          <div className="app">
+            <div className="left">
+              {/* <i className="logo nf nf-dev-windows11"></i> */}
+              {output.glazewm && (
+                <div className="workspaces">
+                  {output.glazewm.currentWorkspaces.map((workspace) => (
+                    <button
+                      className={`workspace ${
+                        workspace.hasFocus && "focused"
+                      } ${workspace.isDisplayed && "displayed"}`}
+                      onClick={() =>
+                        output.glazewm.runCommand(
+                          `focus --workspace ${workspace.name}`
+                        )
+                      }
+                      key={workspace.name}
+                    >
+                      {workspace.displayName ?? workspace.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="center">
+              <CenterContent
+                output={output}
+                showMedia={showMedia}
+                setShowMedia={setShowMedia}
+                formatTime={formatTime}
+              />
+            </div>
+
+            <div className="right">
+              {output.glazewm && (
+                <>
+                  {output.glazewm.isPaused && (
+                    <button
+                      className="paused-button"
+                      onClick={() => glazewm.runCommand("wm-toggle-pause")}
+                    >
+                      PAUSED
+                    </button>
+                  )}
+                  {output.glazewm.bindingModes.map((bindingMode) => (
+                    <button
+                      className="binding-mode"
+                      key={bindingMode.name}
+                      onClick={() =>
+                        output.glazewm.runCommand(
+                          `wm-disable-binding-mode --name ${bindingMode.name}`
+                        )
+                      }
+                    >
+                      {bindingMode.displayName ?? bindingMode.name}
+                    </button>
+                  ))}
+
+                  <button
+                    className={`tiling-direction nf ${
+                      output.glazewm.tilingDirection === "horizontal"
+                        ? "nf-md-swap_horizontal"
+                        : "nf-md-swap_vertical"
+                    }`}
+                    onClick={() =>
+                      output.glazewm.runCommand("toggle-tiling-direction")
+                    }
+                  ></button>
+                </>
+              )}
+
+              {output.network && (
+                <div className="network">
+                  {getNetworkIcon(output.network)}
+                  {/* output.network.defaultGateway?.ssid */}
+                </div>
+              )}
+
+              {output.memory && (
+                <div className="memory">
+                  <i className="nf nf-fa-memory"></i>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      fontSize: "7.5px",
+                      minHeight: "10px",
+                    }}
+                  >
+                    <div
+                      className={`memory-usage ${
+                        output.memory.usage > 85 ? "high-usage" : ""
+                      }`}
+                      style={{ color: "#ffd97d" }}
+                    >
+                      <i className="nf nf-md-alpha_f_box"></i>
+                      <span>
+                        {(output.memory.freeMemory / 1024 ** 3).toFixed(1)}GB
+                      </span>
+                    </div>
+                    <div style={{ color: "#ff9b85" }}>
+                      <i className="nf nf-md-alpha_u_box"></i>
+                      <span>
+                        {(
+                          (output.memory.totalMemory -
+                            output.memory.freeMemory) /
+                          1024 ** 3
+                        ).toFixed(1)}
+                        GB
+                      </span>
+                    </div>
+                    <div style={{ color: "#aaf683" }}>
+                      <i className="nf nf-md-alpha_t_box"></i>
+                      <span>
+                        {(output.memory.totalMemory / 1024 ** 3).toFixed(1)}GB
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {output.cpu && (
+                <div className="cpu">
+                  {/* Change the text color if the CPU usage is high. */}
+                  <i className="nf nf-oct-cpu"></i>
+                  <span className={output.cpu.usage > 85 ? "high-usage" : ""}>
+                    {Math.round(output.cpu.usage)}%
+                  </span>
+                </div>
+              )}
+
+              {output.battery && (
+                <div className="battery">
+                  {/* Show icon for whether battery is charging. */}
+                  {output.battery.isCharging && (
+                    <i className="nf nf-md-power_plug charging-icon"></i>
+                  )}
+                  {getBatteryIcon(output.battery)}
+                  <span
+                    className={
+                      output.battery.chargePercent <= 30 ? "low-battery" : ""
+                    }
+                  >
+                    {Math.round(output.battery.chargePercent)}%
+                  </span>
+                </div>
+              )}
+
+              {output.weather && (
+                <div className="weather">
+                  {getWeatherIcon(output.weather)}
+                  <span>{output.weather.celsiusTemp.toFixed(1)}°C</span>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      }
+    </script>
+  </body>
+</html>

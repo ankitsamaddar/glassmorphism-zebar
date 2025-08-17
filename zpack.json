@@ -1,0 +1,50 @@
+{
+  "$schema": "https://github.com/glzr-io/zebar/raw/v3.1.1/resources/zpack-schema.json",
+  "name": "glassmorphism-zebar",
+  "version": "0.1.0",
+  "description": "Minimal glassmorphisim zebar configuration for spotify controls and a soothing gradient styling.",
+  "tags": [],
+  "previewImages": [
+    "resources\\glassmorphism-zebar-preview.png"
+  ],
+  "repositoryUrl": "",
+  "widgets": [
+    {
+      "name": "glassmorphisim",
+      "htmlPath": "./src/index.html",
+      "zOrder": "normal",
+      "shownInTaskbar": false,
+      "focused": false,
+      "resizable": false,
+      "transparent": false,
+      "includeFiles": [
+        "src/**"
+      ],
+      "caching": {
+        "defaultDuration": 604800,
+        "rules": []
+      },
+      "privileges": {
+        "shellCommands": []
+      },
+      "presets": [
+        {
+          "name": "glassmorphism-default",
+          "anchor": "top_left",
+          "offsetX": "0px",
+          "offsetY": "0px",
+          "width": "100%",
+          "height": "40px",
+          "monitorSelection": {
+            "type": "all"
+          },
+          "dockToEdge": {
+            "enabled": false,
+            "edge": null,
+            "windowMargin": "0px"
+          }
+        }
+      ]
+    }
+  ]
+}
