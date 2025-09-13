@@ -10,7 +10,7 @@ i {
 }
 
 body {
-  color: rgb(255 255 255 / 90%);
+  color: rgb(232 245 233 / 90%);
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   font-family: ui-monospace, monospace;
   font-size: 12px;
@@ -44,20 +44,17 @@ body,
   }
 }
 
+/* --- ROOT BACKGROUND --- */
 #root {
   border-bottom: 1px solid rgb(255 255 255 / 10%);
-  background: linear-gradient(
-    135deg,
-    #1a1a2e 0%,
-    #16213e 25%,
-    #0f3460 50%,
-    #533483 75%,
-    #e43f5a 100%
-  );
+  background: radial-gradient(circle at top left, #1f7d53 0%, transparent 40%),
+    radial-gradient(circle at bottom right, #255f38 0%, transparent 40%),
+    linear-gradient(135deg, #18230f 0%, #27391c 100%);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
   align-items: baseline;
 }
 
+/* --- APP GRID --- */
 .app {
   display: grid;
   grid-template-columns: 1fr 1.5fr 1fr;
@@ -74,6 +71,7 @@ body,
   gap: 10px;
 }
 
+/* --- PANEL ALIGNMENT --- */
 .left,
 .center,
 .right {
@@ -83,15 +81,11 @@ body,
   transform: scaleY(0.9);
   margin: 3.5px 2px;
 }
-
-.center {
-  justify-self: center;
-}
-
 .right {
   justify-self: end;
 }
 
+/* --- DIV STYLING --- */
 .logo,
 .binding-mode,
 .tiling-direction,
@@ -102,14 +96,13 @@ body,
 .battery {
   margin-right: 10px;
 }
-
 .network,
 .memory {
   display: flex;
   flex-direction: row;
   align-items: center;
+  padding: 4px 10px !important;
 }
-
 .network,
 .cycle_count,
 .uptime,
@@ -117,90 +110,129 @@ body,
 .cpu,
 .battery,
 .weather {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(31, 125, 83, 0.12);
+  border: 1px solid rgba(31, 125, 83, 0.25);
   border-radius: 16px;
   padding: 4px 10px;
   backdrop-filter: blur(5px);
   transition: all 0.2s ease;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(232, 245, 233, 0.9);
   min-width: 70px;
   min-height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(228, 63, 90, 0.3);
-    box-shadow: 0 2px 8px rgba(228, 63, 90, 0.2);
-  }
 }
 
-.memory {
-  padding: 2px 10px !important;
-}
-
-/* Icon colors using new theme */
-.network i {
-  color: #a0c4ff;
+/* --- ICON COLOR PALETTE --- */
+.network i,
+.network .network-speed span {
+  color: #9be7c4; /* soft teal */
   transition: all 0.2s ease;
 }
-
-.cpu i {
-  color: #ffadad;
+.cpu i,
+.cpu span {
+  color: #ffe082; /* soft yellow */
   transition: all 0.2s ease;
 }
-
-.memory {
-  color: #caffbf;
+.memory,
+.memory span {
+  color: #c5e1a5; /* soft green */
+  transition: all 0.2s ease;
+  /* padding: 2px 10px !important; */
+}
+.battery i,
+.battery span {
+  color: #80deea; /* soft blue */
   transition: all 0.2s ease;
 }
-
-.battery i {
-  color: #9bf6ff;
-  transition: all 0.2s ease;
-}
-
 /* Hover effects using new theme colors */
 .network:hover i,
-.network:hover span,
 .cpu:hover i,
 .memory:hover i:not([class*="nf-md-alpha_"]),
 .battery:hover i,
 .weather:hover i {
-  color: #fcab64 !important;
+  color: #41b06e !important; /* light green */
 }
-
+.cpu:hover span,
+.battery:hover span,
+.weather:hover span,
+.memory:hover span,
+.memory:hover i[class*="nf-md-alpha"] {
+  color: #a5d6a7;
+  transition: color 0.3s ease;
+}
 /* Update hover style */
 .network:hover,
 .cpu:hover,
 .memory:hover,
 .battery:hover,
 .weather:hover {
-  border-color: rgba(251, 139, 36, 0.3);
-  box-shadow: 0 2px 8px rgba(251, 139, 36, 0.2);
-  transform: scale(1.05);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: rgba(31, 125, 83, 0.2);
+  border-color: rgba(31, 125, 83, 0.4);
+  /* box-shadow: 0 2px 10px rgba(31, 125, 83, 0.35); */
+  /* transform: scale(1.01); */
   filter: brightness(1.05);
+  color: #a5d6a7;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* Update alert colors to use theme red */
-.cpu .high-usage {
-  color: #f25757 !important;
-  animation: flash 0.5s infinite;
+/* ---- WEATHER DYNAMIC COLORS ---- */
+.weather-icon,
+.weather span {
+  transition: color 0.3s ease;
+}
+/* Theme-aligned tones */
+.weather.clear-day {
+  color: #ffd54f; /* warm golden sun */
+}
+.weather.clear-night {
+  color: #80cbc4; /* soft teal moonlight */
+}
+.weather.cloudy-day {
+  color: #b0bec5; /* muted cloud gray */
+}
+.weather.cloudy-night {
+  color: #90a4ae; /* darker muted gray */
+}
+.weather.light-rain-day {
+  color: #4dd0e1; /* aqua drizzle */
+}
+.weather.light-rain-night {
+  color: #26c6da; /* teal drizzle */
+}
+.weather.heavy-rain-day {
+  color: #29b6f6; /* stronger sky blue */
+}
+.weather.heavy-rain-night {
+  color: #0288d1; /* deep teal-blue */
+}
+.weather.snow-day {
+  color: #e0f2f1; /* frosty pastel */
+}
+.weather.snow-night {
+  color: #b2dfdb; /* muted icy teal */
+}
+.weather.thunder-day {
+  color: #ffca28; /* golden bolt */
+}
+.weather.thunder-night {
+  color: #ffb300; /* amber bolt */
+}
+.weather.unknown {
+  color: #cfd8dc; /* neutral fallback */
 }
 
-.memory .high-usage {
-  color: #f25757 !important;
-  animation: flash 0.5s infinite;
-}
-
+/* Alerts (keep red for urgency) */
+.cpu .high-usage,
+.memory .high-usage,
+.memory .high-usage span,
 .low-battery {
-  color: #f25757 !important;
+  color: #ff6969 !important; /* bright red */
   animation: flash 0.5s infinite;
 }
 
+/* --- WORKSPACES --- */
 .workspaces {
   display: flex;
   align-items: center;
@@ -211,28 +243,26 @@ body,
   backdrop-filter: blur(10px);
   position: relative;
 }
-
 .workspaces::before {
   content: "";
   position: absolute;
   background: linear-gradient(
     135deg,
-    rgba(255, 97, 118, 0.8),
-    rgba(157, 113, 232, 0.8)
+    rgba(31, 125, 83, 0.8),
+    rgba(37, 95, 56, 0.8)
   );
   border-radius: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(228, 63, 90, 0.4);
+  box-shadow: 0 4px 15px rgba(31, 125, 83, 0.3);
   z-index: 0;
   left: var(--slider-left, 0);
   width: var(--slider-width, 0);
   height: calc(100% - 8px);
   top: 4px;
 }
-
 .workspace {
   background: transparent;
-  color: rgb(255 255 255 / 70%);
+  color: rgb(232 245 233 / 70%);
   border: none;
   border-radius: 16px;
   cursor: pointer;
@@ -244,44 +274,49 @@ body,
   min-width: 40px;
   text-align: center;
   transition: color 0.3s ease;
-
   &.displayed {
-    color: rgb(255 255 255 / 85%);
+    color: rgba(109, 139, 142, 0.85);
   }
-
   &.focused {
-    color: white;
+    color: #e8f5e9;
   }
-
   &:hover:not(.focused) {
-    color: rgb(255 255 255 / 90%);
+    color: rgb(65 176 110 / 90%);
     background: rgba(255, 255, 255, 0.1);
     transform: scale(1.02);
   }
 }
 
+/* --- CONTROL BUTTONS --- */
 .binding-mode,
 .tiling-direction,
 .paused-button {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgb(255 255 255 / 90%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(31, 125, 83, 0.12);
+  color: rgba(232, 245, 233, 0.9);
+  border: 1px solid rgba(31, 125, 83, 0.25);
   border-radius: 16px;
   line-height: 1;
   padding: 6px 10px;
+  min-height: 32px;
   cursor: pointer;
   backdrop-filter: blur(3px);
   transition: all 0.2s ease;
 
   &:hover {
-    background: rgba(83, 52, 131, 0.3);
-    border-color: rgba(255, 97, 118, 0.4);
-    color: rgb(255, 97, 118);
+    background: rgba(31, 125, 83, 0.25);
+    border-color: rgba(31, 125, 83, 0.4);
+    box-shadow: 0 2px 10px rgba(31, 125, 83, 0.35);
+    color: #41b06e;
   }
-  &:active {
-    transform: scale(0.95);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-  }
+}
+
+.binding-mode:active,
+.tiling-direction:active {
+  transform: scale(0.95);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+.paused-button {
+  color: #41b06e !important;
 }
 
 .binding-mode {
@@ -301,14 +336,15 @@ body,
 .battery .charging-icon {
   position: absolute;
   font-size: 7px;
-  left: 10px;
+  left: 7px;
   top: 9px;
-  color: rgb(255, 60, 0);
+  color: #ff6969 !important; /* bright red */
   animation: chargePulse 1.5s ease-in-out infinite;
 }
 
 @keyframes chargePulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.7;
     transform: scale(1);
   }
@@ -318,55 +354,54 @@ body,
   }
 }
 
+/* --- CENTER PANEL --- */
 .center {
   justify-self: center;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(31, 125, 83, 0.15);
+  border: 1px solid rgba(31, 125, 83, 0.25);
   border-radius: 20px;
   padding: 8px 16px;
+  min-height: 33.5px;
   backdrop-filter: blur(5px);
-  color: #ffffff;
+  color: #e8f5e9;
   font-weight: 500;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
 }
-
 .center:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(228, 63, 90, 0.3);
-  box-shadow: 0 2px 8px rgba(228, 63, 90, 0.2);
+  background: rgba(31, 125, 83, 0.25);
+  border-color: rgba(31, 125, 83, 0.4);
+  box-shadow: 0 2px 12px rgba(31, 125, 83, 0.4);
 }
 
+/* --- MEDIA CONTROLS --- */
 .media-controls {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  background: rgba(31, 125, 83, 0.15);
+  border: 1px solid rgba(31, 125, 83, 0.25);
+  border-radius: 6px;
   padding: 4px 6px;
   cursor: pointer;
   backdrop-filter: blur(3px);
   transition: all 0.2s ease;
   font-size: 8px !important;
-  color: white !important;
+  color: #e8f5e9 !important;
 }
-
 .media-controls:hover {
-  background: rgba(171, 255, 97, 0.3) !important;
-  border-color: rgba(27, 185, 84, 0.5) !important;
-  color: #76ff61 !important;
+  background: rgba(37, 95, 56, 0.3) !important;
+  border-color: rgba(37, 95, 56, 0.5) !important;
+  color: #6d8b8e !important;
   transform: scale(1.1);
 }
-
 .media-controls:active {
-  background: rgba(255, 146, 177, 0.5) !important;
-  border-color: rgba(228, 63, 90, 0.4) !important;
-  color: #fe7295 !important;
+  background: rgba(31, 125, 83, 0.35) !important;
+  border-color: rgba(31, 125, 83, 0.5) !important;
+  color: #a5d6a7 !important;
   transform: scale(0.95);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
 }
-
 .song-time {
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(232, 245, 233, 0.7);
   background: rgba(0, 0, 0, 0.3);
   padding: 2px 6px;
   border-radius: 4px;
@@ -378,8 +413,11 @@ body,
   min-width: 300px;
   display: inline-block;
   text-align: center;
+  &:hover {
+    color: #a5d6a7;
+  }
 }
-
+/* --- ICONS --- */
 .nf:not([class*="nf-md-alpha_"]):not([class*="nf-md-swap_"]):not(
     [class*="nf-md-power_plug"]
   ) {

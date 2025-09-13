@@ -228,8 +228,8 @@
                     }`}
                   ></i>
                   <div className="network-speed">
-                    <div>↓{download}</div>
-                    <div>↑{upload}</div>
+                    <span>↓{download}</span>
+                    <span>↑{upload}</span>
                   </div>
                 </>
               );
@@ -244,8 +244,8 @@
                     }`}
                   ></i>
                   <div className="network-speed">
-                    <div>↓{download}</div>
-                    <div>↑{upload}</div>
+                    <span>↓{download}</span>
+                    <span>↑{upload}</span>
                   </div>
                 </>
               );
@@ -269,108 +269,84 @@
 
         // Get icon to show for current weather status.
         function getWeatherIcon(weatherOutput) {
+          const baseClass = "weather-icon";
           switch (weatherOutput.status) {
             case "clear_day":
               return (
                 <i
-                  className="nf nf-weather-day_sunny"
-                  style={{ color: "#FFF9B1" }} // Pastel yellow
+                  className={`nf nf-weather-day_sunny ${baseClass} clear-day`}
                 ></i>
               );
-
             case "clear_night":
               return (
                 <i
-                  className="nf nf-weather-night_clear"
-                  style={{ color: "#B5EAD7" }} // Pastel mint
+                  className={`nf nf-weather-night_clear ${baseClass} clear-night`}
                 ></i>
               );
-
             case "cloudy_day":
               return (
                 <i
-                  className="nf nf-weather-day_cloudy"
-                  style={{ color: "#D3D3D3" }} // Light gray (soft cloud)
+                  className={`nf nf-weather-day_cloudy ${baseClass} cloudy-day`}
                 ></i>
               );
-
             case "cloudy_night":
               return (
                 <i
-                  className="nf nf-weather-night_alt_cloudy"
-                  style={{ color: "#C0C0C0" }} // Slightly darker soft gray
+                  className={`nf nf-weather-night_alt_cloudy ${baseClass} cloudy-night`}
                 ></i>
               );
-
             case "light_rain_day":
               return (
                 <i
-                  className="nf nf-weather-day_sprinkle"
-                  style={{ color: "#A0E7FF" }} // Pastel sky blue
+                  className={`nf nf-weather-day_sprinkle ${baseClass} light-rain-day`}
                 ></i>
               );
-
             case "light_rain_night":
               return (
                 <i
-                  className="nf nf-weather-night_alt_sprinkle"
-                  style={{ color: "#B5EAD7" }} // Pastel mint (consistent with night theme)
+                  className={`nf nf-weather-night_alt_sprinkle ${baseClass} light-rain-night`}
                 ></i>
               );
-
             case "heavy_rain_day":
               return (
                 <i
-                  className="nf nf-weather-day_rain"
-                  style={{ color: "#7AC7E7" }} // Soft pastel blue
+                  className={`nf nf-weather-day_rain ${baseClass} heavy-rain-day`}
                 ></i>
               );
-
             case "heavy_rain_night":
               return (
                 <i
-                  className="nf nf-weather-night_alt_rain"
-                  style={{ color: "#8AD0D8" }} // Muted teal pastel
+                  className={`nf nf-weather-night_alt_rain ${baseClass} heavy-rain-night`}
                 ></i>
               );
-
             case "snow_day":
               return (
                 <i
-                  className="nf nf-weather-day_snow"
-                  style={{ color: "#F0F8FF" }} // Very light blue-white (icy pastel)
+                  className={`nf nf-weather-day_snow ${baseClass} snow-day`}
                 ></i>
               );
-
             case "snow_night":
               return (
                 <i
-                  className="nf nf-weather-night_alt_snow"
-                  style={{ color: "#E6F3FF" }} // Slightly visible icy tone
+                  className={`nf nf-weather-night_alt_snow ${baseClass} snow-night`}
                 ></i>
               );
-
             case "thunder_day":
               return (
                 <i
-                  className="nf nf-weather-day_lightning"
-                  style={{ color: "#FFD1DC" }} // Pastel pink (soft for contrast)
+                  className={`nf nf-weather-day_lightning ${baseClass} thunder-day`}
                 ></i>
               );
-
             case "thunder_night":
               return (
                 <i
-                  className="nf nf-weather-night_alt_lightning"
-                  style={{ color: "#CBAACB" }} // Pastel lavender
+                  className={`nf nf-weather-night_alt_lightning ${baseClass} thunder-night`}
                 ></i>
               );
-
             default:
               return (
                 <i
-                  className="nf nf-weather-question"
-                  style={{ color: "#CCCCCC" }}
+                  className={`nf nf-weather-question ${baseClass} unknown`}
                 ></i>
               );
           }
@@ -526,7 +502,7 @@
               )}
 
               {output.weather && (
-                <div className="weather">
+                <div className={`weather ${output.weather.status}`}>
                   {getWeatherIcon(output.weather)}
                   <span>{output.weather.celsiusTemp.toFixed(1)}°C</span>
                 </div>
